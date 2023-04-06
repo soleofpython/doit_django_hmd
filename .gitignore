@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 # add mine
-doit_venv
+doit_venv/
+migrations/
+_media/
