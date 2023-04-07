@@ -1,12 +1,48 @@
 {% extends 'blog/base.html' %}
 
-{% block main_area %}
-<div class="row">
+{% block main-area %}
 
-<!-- Blog entries-->
-<div class="col-lg-8" id="main-area">
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Blog Post - Start Bootstrap Template</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" >
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
+    </head>
+    <body>
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#!">솔레 미오</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#!">
+                            About Me
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="#!">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!">포트폴리오</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!">토이프로젝트</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!">My Skill</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+
     <!-- Title-->
-    <h2 class="mt-4">{{ post.title }}</h2>
+    <h1 class="mt-4">{{ post.title }}</h1>
     <!-- Author-->
     <p class="lead">
         by
@@ -18,9 +54,10 @@
     <hr />
     <!-- Preview image-->
     {% if post.head_image %}
-    <img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="{{ post.head_image.url }}" />
+    <!-- <img class="img-fluid rounded" src="https://picsum.photos/id/{{ post.id }}/900/250" alt="..." /> -->
+    <img class="img-fluid rounded" src="{{post.head_image.url}}" alt="{{post.title}} head_image">
     {% else %}
-    <img class="img-fluid rounded" src="https://picsum.photos/id/{{ post.id }}/900/250" alt="랜덤 이미지" />
+        <img class="img-fluid rounded" src="https://picsum.photos/id/{{ post.id }}/900/250" alt="random_image" />
     {% endif %}
     <hr />
     <!-- Post content-->
@@ -28,28 +65,25 @@
         {{ post.content }}
     </p>
     {% if post.file_upload %}
-        <a href="{{ post.file_upload.url }}" class="btn btn-outline-dark" role="button" download>
-            download
+        <a href="{{post.file_upload.url}}" class="btn btn-outline-dark" role="button" download>Download: 
+
             {% if post.get_file_ext == 'csv' %}
-            <i class="bi bi-filetype-csv"></i>
+                <i class="fas fa-file-csv"></i>
             {% elif post.get_file_ext == 'xlsx' or post.get_file_ext == 'xls' %}
-            <i class="bi bi-filetype-xls"></i>
+                <i class="fas fa-file-excel"></i>
             {% elif post.get_file_ext == 'docx' or post.get_file_ext == 'doc' %}
-            <i class="bi bi-filetype-docx"></i>
-            {% elif post.get_file_ext == 'ppt' or post.get_file_ext == 'ppt' %}
-            <i class="bi bi-filetype-ppt"></i>
-            {% elif post.get_file_ext == 'pdf' %}
-            <i class="bi bi-filetype-pdf"></i>
-            {% elif post.get_file_ext == 'txt' %}
-            <i class="bi bi-filetype-txt"></i>
+                <i class="fas fa-file-word"></i>
             {% else %}
-            <i class="bi bi-file-earmark-arrow-down"></i>
+                <i class="fas fa-file"></i>
+
+            <i class="bi bi-filetype-txt"></i>
             {% endif %}
             {{ post.get_file_name }}
+
         </a>
+
     {% endif %}
     <hr />
-
     <!-- Comments form-->
     <div class="card my-4">
         <h5 class="card-header">Leave a Comment:</h5>
@@ -90,8 +124,5 @@
             </div>
         </div>
     </div>
-</div>
-
-{% include 'blog/side_widgets.html' %}
-</div>
-{% endblock %}
+<!-- </div> -->
+{% endblock %}                

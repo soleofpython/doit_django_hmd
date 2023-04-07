@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
-from .models import Post
+from .models import Post, Category
 
 # Create your views here.
 # def index(request):
@@ -15,17 +15,27 @@ from .models import Post
 
 class PostList(ListView):
     model = Post
-    ordering = '-pk'
-    
-class PostDetail(DetailView):
-    model = Post
-      
     # post_list.html : class 이름_list.html
     # 내부적으로 정의가 되어있기 때문에 생략 가능
     # 파일명을 위에 있는 규칙으로 하지 않을 경우 명시해 줘야 함
     # template_name = 'blog/post_list.html'
     # template_name = 'blog/index.html'
     
+    ordering = '-pk'
+    
+    def get_context_data(self, **kwargs): 
+        
+        context = super(PostList,self).get_context_data()
+        context['categories'] = Category.objects.all()
+        # Post 테이블에서 category 필드를 선택안한 포스트의 갯수
+        context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        
+        return context
+    
+    
+class PostDetail(DetailView):
+    model = Post
+    #template_name = 'blog/post_detail.html'  
     
 # def single_post_page(request, pk):
 #     post = Post.objects.get(pk=pk)
