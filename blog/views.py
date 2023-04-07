@@ -35,6 +35,16 @@ class PostList(ListView):
     
 class PostDetail(DetailView):
     model = Post
+    
+    def get_context_data(self, **kwargs): 
+        
+        context = super(PostDetail,self).get_context_data()
+        context['categories'] = Category.objects.all()
+        # Post 테이블에서 category 필드를 선택안한 포스트의 갯수
+        context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        
+        return context
+    
     #template_name = 'blog/post_detail.html'  
     
 # def single_post_page(request, pk):
