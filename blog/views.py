@@ -1,6 +1,22 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView
-from .models import Post, Category
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Post, Category, Tag
+from .forms import PostForm
+
+class PostCreate(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+    templates_name = 'blog/post_form.html'
+    # fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
+    
+    def form_valid(self, form):
+        current_user = self.request.user
+        if current_user.is_authenticated:
+            form.instance.author = current_user
+            return super(PostCreate, self).form_valid(form)
+        else:
+            return redirect('/blog/')
 
 # Create your views here.
 # def index(request):
@@ -11,6 +27,21 @@ from .models import Post, Category
 #         'blog/index.html',
 #         {'posts' : posts,}
     # )
+
+def tag_page(request, slug):
+    tag = Tag.objects.get(slug=slug)
+    post_list = tag.post_set.all()
+    
+    return render(
+        request,
+        'blog/post_list.html',
+        {
+            'post_list' : post_list,
+            'tag' : tag,
+            'categories' : Category.objects.all(),
+            'no_category_post_count' : Post.objects.filter(category=None).count(),
+        }
+    )
     
 
 class PostList(ListView):
@@ -57,3 +88,23 @@ class PostDetail(DetailView):
 #             'post' : post,
 #         }
 #     )
+
+def category_page(request, slug):
+    # 선택한 슬러그의 해당하는 카테고리 테이블의 레코드
+    category = Category.objects.get(slug=slug)
+    context = {
+        # Post 테이블에서 선택한 카테고리의 레코드만 필터링
+        'post_list' : Post.objects.filter(category=category),
+        # 카테고리 테이블의 목록을 모두 가져옴
+        'categories' : Category.objects.all(),
+        # Post 테이블에서 카테고리 필드를 선택안 한 포스트의 갯수
+        'no_category_post_count' : Post.objects.filter(category=None).count(),
+        # 선택한 카테고리의 레코드
+        'category' : category
+    }    
+    # print(context)
+    return render(
+        request,
+        'blog/post_list.html',
+        context
+    )

@@ -16,13 +16,13 @@
       <div class="card-body">
         <div class="row">
           <!-- <div class="col-lg-6"> -->
-            <ul class="list-unstyled mb-0">
+            <ul class="list-unstyled mb-0 ml-3">
 
               <!-- {{ categories }} -->
               {%  for category in categories %}
                <!-- .post_set : 하나의 카테고리와 연결되어 있는 post 테이블의 레코드 집합 -->
                <!-- .count : 레코드 집합의 갯수 -->
-              <li><a href="category.get_absolute_url">{{category}} {{category.post_set.count}}</a>
+              <li><a href="{{category.get_absolute_url}}">{{category}} {{category.post_set.count}}</a>
               </li>
               {% endfor %}
 
