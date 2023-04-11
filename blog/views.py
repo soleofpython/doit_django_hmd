@@ -227,7 +227,19 @@ def new_comment(request, pk):
             return redirect (post.get_absolute_url())
     else:
         raise PermissionDenied
-            
+
+# get_object_or_404() 함수를 사용해 delete_comment() 함수에서 인자 pk값과 댓글을 쿼리셋으로 받아 comment 변수에 저장. 만일 pk에 해당하는 댓글이 없다면 404 오류가 발생.           
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    post = comment.post    
+    
+    # delete_comment() 함수까지 접근한 방문자가 로그인한 사용자인지 댓글의 작성자인지 확인
+    # 권한이 없는 데도 접근한 것은 PermissionDenied 오류를 발생
+    if request.user.is_authenticated and request.user == comment.author:
+        comment.delete()
+        return redirect(post.get_absolute_url())
+    else:
+        raise PermissionDenied
             
             
             

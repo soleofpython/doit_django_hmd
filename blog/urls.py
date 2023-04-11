@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # 댓글 삭제를 위한 URL 추가, 매칭뷰는 delete_comment로 지정 
+    path('delete_comment/<int:pk>/', views.delete_comment),
     # 댓글 수정페이지 경로를 추가, CBV 스타일로 생성
     path('update_comment/<int:pk>/', views.CommentUpdate.as_view()),
     # update_post/<int:pk>/로 접근시 PostUpdate 클래스 사용
