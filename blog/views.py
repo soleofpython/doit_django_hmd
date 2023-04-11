@@ -54,6 +54,8 @@ class PostList(ListView):
     # template_name = 'blog/index.html'
     
     ordering = '-pk'
+    # 한 페이지당 보여줄 post 갯수 정하기
+    paginate_by = 2
     
     def get_context_data(self, **kwargs): 
         
