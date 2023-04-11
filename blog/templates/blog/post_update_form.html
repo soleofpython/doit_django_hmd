@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+<!-- post_form.html을 복사, 파일명 위와 같이 교체, Edit로 수정 -->
+{% block head_title %}Edit Post - Blog{% endblock %}
+
+{% block main_area %}
+<!-- <div id="main_area" class="mb-5"> -->
+    <h1>Edit Post</h1>
+    <hr/>
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+        <table>
+            {{form}}
+        </table>
+        <button type="submit" class="badge badge-info float-right">Submit</button>
+    </form>
+<!-- </div> -->
+{% endblock %}

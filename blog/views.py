@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, CreateView
+
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Category, Tag
+
+from django.core.exceptions import PermissionDenied
 from .forms import PostForm
 from django.db.models import Q
 
@@ -36,21 +39,26 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 #         {'posts' : posts,}
     # )
 
-def tag_page(request, slug):
-    tag = Tag.objects.get(slug=slug)
-    post_list = tag.post_set.all()
+
+
+# PostUpdate 클래스를 CBV 스타일 적용        
+# CreateView 대신 UpdateView 사용, 기존 작성자가 이미 존재하므로 form_valid 함수를 사용하기 않음.
+class PostUpdate(LoginRequiredMixin, UpdateView):
+    model = Post
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category', 'tags']
     
-    return render(
-        request,
-        'blog/post_list.html',
-        {
-            'post_list' : post_list,
-            'tag' : tag,
-            'categories' : Category.objects.all(),
-            'no_category_post_count' : Post.objects.filter(category=None).count(),
-        }
-    )
+    # CBV로 View를 만들 때, 원하는 html 파일을 템플릿 파일로 설정
+    template_name = 'blog/post_update_form.html'
     
+    # dispatch() 함수는 방문자가 서버에 GET 방식인지 POST 방식으로 요청했는지 판단
+    # request.user가 로그인한 상태
+    # Post 인스턴스의 author 필드가 request.user와 동일한 경우에만 dispatch() 함수가 역할 가능
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user == self.get_object().author:
+            return super(PostUpdate, self).dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+        
 
 class PostList(ListView):
     model = Post
@@ -73,7 +81,7 @@ class PostList(ListView):
         
         return context
     
-    
+
 class PostDetail(DetailView):
     model = Post
     
@@ -99,25 +107,7 @@ class PostDetail(DetailView):
 #         }
 #     )
 
-def category_page(request, slug):
-    # 선택한 슬러그의 해당하는 카테고리 테이블의 레코드
-    category = Category.objects.get(slug=slug)
-    context = {
-        # Post 테이블에서 선택한 카테고리의 레코드만 필터링
-        'post_list' : Post.objects.filter(category=category),
-        # 카테고리 테이블의 목록을 모두 가져옴
-        'categories' : Category.objects.all(),
-        # Post 테이블에서 카테고리 필드를 선택안 한 포스트의 갯수
-        'no_category_post_count' : Post.objects.filter(category=None).count(),
-        # 선택한 카테고리의 레코드
-        'category' : category
-    }    
-    # print(context)
-    return render(
-        request,
-        'blog/post_list.html',
-        context
-    )
+
     
 class PostSearch(PostList):
     paginate_by = None
@@ -139,3 +129,40 @@ class PostSearch(PostList):
         return context
     
     # | Q(content__contains=q)
+    
+# 함수형 view 정의, tag 필터링   
+def tag_page(request, slug):
+    tag = Tag.objects.get(slug=slug)
+    post_list = tag.post_set.all()
+    
+    return render(
+        request,
+        'blog/post_list.html',
+        {
+            'post_list' : post_list,
+            'tag' : tag,
+            'categories' : Category.objects.all(),
+            'no_category_post_count' : Post.objects.filter(category=None).count(),
+        }
+    )
+
+# 함수형 view 정의, category 필터링  
+def category_page(request, slug):
+    # 선택한 슬러그의 해당하는 카테고리 테이블의 레코드
+    category = Category.objects.get(slug=slug)
+    context = {
+        # Post 테이블에서 선택한 카테고리의 레코드만 필터링
+        'post_list' : Post.objects.filter(category=category),
+        # 카테고리 테이블의 목록을 모두 가져옴
+        'categories' : Category.objects.all(),
+        # Post 테이블에서 카테고리 필드를 선택안 한 포스트의 갯수
+        'no_category_post_count' : Post.objects.filter(category=None).count(),
+        # 선택한 카테고리의 레코드
+        'category' : category
+    }    
+    # print(context)
+    return render(
+        request,
+        'blog/post_list.html',
+        context
+    )
