@@ -9,6 +9,13 @@
     <form method="post" enctype="multipart/form-data">{% csrf_token %}
         <table>
             {{form}}
+            <!-- <tr> 태그에 label 과 input 요소 추가 -->
+            <!-- 크롬에서 새로 만든 Tags 입력란 표시 -->
+            <tr>
+                <th><label for="id_tags_str">Tags:</label></th>
+                <td><input type="text" name="tags_str" id="id_tags_str"></td>
+            </tr>>
+
         </table>
         <button type="submit" class="badge badge-info float-right">Submit</button>
     </form>

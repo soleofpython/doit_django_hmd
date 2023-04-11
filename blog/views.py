@@ -4,6 +4,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Category, Tag
 
+# 첫번째 Tag 모델은 인스턴스, 두번째는 bool 형태의 값 의미
+from django.utils.text import slugify
 from django.core.exceptions import PermissionDenied
 from .forms import PostForm
 from django.db.models import Q
@@ -25,7 +27,28 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         current_user = self.request.user
         if current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
             form.instance.author = current_user
-            return super(PostCreate, self).form_valid(form)
+            # form_valid 함수 결과값을 response라는 변수에 저장
+            response= super(PostCreate, self).form_valid(form)
+            # name="tags_str"인 input의 값을 호출함.
+            tags_str = self.request.POST.get("tags_str")
+            # tags_str로 받은 값의 쉼표를 세미콜론으로 모두 변경, split해서 리스트로 tags_list에 저장
+            if tags_str :
+                tags_str = tags_str.strip() 
+                
+                tags_str = tags_str.replace(',',';')
+                tags_list = tags_str.split(';')
+                
+                for t in tags_list:
+                    t = t.strip()
+                    tag, is_tag_created = Tag.objects.get_or_create(name=t)
+                    if is_tag_created:
+                        tag.slug = slugify(t, allow_unicode=True)
+                        tag.save()
+                    self.object.tags.add(tag)
+                    
+            return response
+            
+             
         else:
             return redirect('/blog/')
 
