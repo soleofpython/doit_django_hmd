@@ -53,7 +53,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google', 
     # 카카오 아이디 로그인
     'allauth.socialaccount.providers.kakao',
+    
+    # crispy
+    'crispy_forms',
+    'crispy_bootstrap4',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -176,3 +181,9 @@ LOGIN_REDIRECT_URL = '/blog/'
 #         }
 #     }
 # }
+
+# crispy form 
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+
+CRISPY_TEMPLATE_PACK = "bootstrap4"

@@ -8,6 +8,8 @@ urlpatterns = [
     path('create_post/', views.PostCreate.as_view()),
     path('tag/<str:slug>/', views.tag_page),
     path('category/<str:slug>/', views.category_page, name='category_filter'),
+    # URL에 있는 pk로 포스트를 찾고, 댓글을 달기 위해 '<int:pk>/new_comment/', views.new_comment 로 설정
+    path('<int:pk>/new_comment/', views.new_comment),  
     path('<int:pk>/', views.PostDetail.as_view(), name='post_etail'),
     path('', views.PostList.as_view(), name="post_list"),
     # /blog/category/{self.slug}

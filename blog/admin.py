@@ -1,9 +1,13 @@
 from django.contrib import admin
-from .models import Post, Category, Tag
+# from markdownx.admin import MarkdownxModelAdmin
+from .models import Post, Category, Tag, Comment
 
 # summernote 관련 라이브러리
 
 from django_summernote.admin import SummernoteModelAdmin
+
+# admin.site.register(Post, MarkdownxModelAdmin)
+admin.site.register(Comment)
 
 # Register your models here.
 class PostAdmin(SummernoteModelAdmin):

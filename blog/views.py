@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import get_object_or_404
 from .models import Post, Category, Tag
+from .forms import CommentForm
 
 # 첫번째 Tag 모델은 인스턴스, 두번째는 bool 형태의 값 의미
 from django.utils.text import slugify
@@ -114,6 +116,8 @@ class PostDetail(DetailView):
         context['categories'] = Category.objects.all()
         # Post 테이블에서 category 필드를 선택안한 포스트의 갯수
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        # PostDetail 클래스의 get_context_data() 함수에서 CommentForm을 comment_form으로 전달
+        context['comment_form'] = CommentForm
         
         return context
     
@@ -189,3 +193,27 @@ def category_page(request, slug):
         'blog/post_list.html',
         context
     )
+    
+def new_comment(request, pk):
+    # 비정상적인 방법으로 new_comment에 접근하려는 시도에는 PermissionDenied 발생
+    if request.user.is_authenticated :
+        post = get_object_or_404(Post, pk=pk)
+        
+        if request.method == 'POST':
+            # POST 방식으로 들어온 정보를 CommentForm 형태로 가져옴
+            comment_form = CommentForm(request.POST)
+            # 폼이 유효하게 작성되었으면 해당 내용을 신규 레코드로 만들어 DB에 저장
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.post = post
+                comment.author = request.user
+                comment.save()
+                return redirect (comment.get_absolute_url())
+        else:
+            return redirect (post.get_absolute_url())
+    else:
+        raise PermissionDenied
+            
+            
+            
+            
