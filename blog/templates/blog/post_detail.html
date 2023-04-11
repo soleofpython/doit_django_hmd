@@ -113,10 +113,20 @@
     <div class="media mb-4" id="comment-{{comment.pk}}">
         <img class="d-flex mr-3 rounded-circle" src="https://via.placeholder.com/50x50" alt="..." />
         <div class="media-body">
+            <!-- Edit 버튼 추가, 댓글의 작성자인 경우에 한해 <edit> 버튼을 구성하는 html 코드가 출력되도록 함 -->
+            {% if user.is_authenticated and comment.author == user %}
+                <a role="button" class="btn btn-sm btn-info float-right" id="comment-{{comment.pk}}-update-btn" href="/blog/update_comment/{{comment.pk}}/">edit</a>
+            {% endif %}
             <!-- comment의 content는 <p> 태그안에서 표시, 마크다운 사용 불가 -->
             <h5 class="mt-0">{{comment.author.username}} &nbsp; &nbsp;<small class="text-muted">{{comment.created_at}}</small></h5>
             <!-- 가독성을 높이기 위해 | linebreaks 를 추가 -->
             <p>{{ comment.content | linebreaks }}</p>
+
+            <!-- 댓글이 수정되면 created_at과 modified_at은 값이 달라짐. 만약 다르다면 Updated: {{comment.modified_at}} 을 출력하는 기능 추가 -->
+            {% if comment.created_at != commnet.modified_at %}
+                <p class="text-muted float-right"><small>Updated:{{comment.modified_at}}</small></p>
+            {% endif %}
+
         </div>
         {% endfor %}
     {% endif %}   

@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 from .forms import CommentForm
 
 # 첫번째 Tag 모델은 인스턴스, 두번째는 bool 형태의 값 의미
@@ -133,6 +133,20 @@ class PostDetail(DetailView):
 #             'post' : post,
 #         }
 #     )
+
+# 로그인 되어 있지 않은 상태로 POST 방식으로 정보를 보내는 상황을 막기 위해 LoginRequiredMixin 포함
+class CommentUpdate(LoginRequiredMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    # dispatch() 메서드는 웹 방문자의 요청이 GET 인지 POST인지 판단 역할을 한다.
+    def dispatch(self, request, *args, **kwargs):
+        
+        if request.user.is_authenticated and request.user == self.get_object().author:
+            return super(CommentUpdate, self).dispatch(request, *args, **kwargs)
+        # 댓글 작성자와 로그인 사용자가 다른 경우에는 PermissionDenied 오류가 발생토록 함.
+        else:
+            raise PermissionDenied    
+    
 
 
     
